@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d181f">
+  <meta name="description" content="一份为你准备的生日祝福">
+  <title>生日快乐</title>
+  <link rel="icon" href="birthday-night.png" type="image/png">
+  <link rel="preload" href="birthday-night.png" as="image">
+  <link rel="preload" href="meiji-notepad.png" as="image">
+  <link rel="preload" href="7b1b466662de1d48387f1db1d3d6c756 (1).gif" as="image">
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #fff8e8;
+      --muted: rgba(255, 248, 232, .72);
+      --gold: #f6c85f;
+      --coral: #ef746f;
+      --green: #4aa092;
+      --deep: #0d181f;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+
+    body {
+      min-width: 320px;
+      overflow: hidden;
+      background: var(--deep);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", system-ui, sans-serif;
+    }
+
+    button { font: inherit; }
+
+    .experience {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100svh;
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    .background, .veil, #effects {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .background {
+      z-index: -3;
+      object-fit: cover;
+      object-position: center;
+      user-select: none;
+    }
+
+    .veil {
+      z-index: -2;
+      background: linear-gradient(180deg, rgba(7, 13, 18, .32), rgba(7, 13, 18, .03) 44%, rgba(8, 23, 25, .38));
+    }
+
+    #effects { z-index: 6; pointer-events: none; transition: opacity 400ms ease; }
+
+    .intro, .celebration, .letter-view {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: max(30px, env(safe-area-inset-top)) max(22px, env(safe-area-inset-right)) max(26px, env(safe-area-inset-bottom)) max(22px, env(safe-area-inset-left));
+      text-align: center;
+    }
+
+    .intro {
+      justify-content: center;
+      transition: opacity 700ms ease, transform 700ms ease;
+    }
+
+    .intro-copy { margin-top: clamp(-80px, -8vh, -36px); text-shadow: 0 2px 18px rgba(0, 0, 0, .28); }
+    .eyebrow { margin: 0 0 12px; color: var(--gold); font-size: 12px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; }
+
+    h1, h2 {
+      margin: 0;
+      font-family: "STKaiti", "KaiTi", "Microsoft YaHei", sans-serif;
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .intro h1 { font-size: clamp(42px, 12vw, 72px); }
+    .intro-note { margin: 14px 0 0; color: var(--muted); font-size: 16px; letter-spacing: .08em; }
+
+    .open-button {
+      display: grid;
+      position: relative;
+      place-items: center;
+      gap: 18px;
+      margin-top: clamp(38px, 7vh, 70px);
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .intro-sticker-slot { position: absolute; top: 8px; left: calc(100% + 16px); z-index: 3; display: block; width: 90px; opacity: 0; pointer-events: none; animation: intro-sticker-pop 680ms cubic-bezier(.2, .9, .25, 1.25) .65s both; transform-origin: 50% 100%; }
+    .intro-sticker { display: block; width: 100%; height: auto; filter: drop-shadow(0 10px 10px rgba(0, 0, 0, .18)); animation: intro-sticker-bob 2.8s ease-in-out 1.4s infinite; transform-origin: 50% 85%; }
+
+    .gift { position: relative; z-index: 2; width: 112px; height: 96px; filter: drop-shadow(0 18px 14px rgba(0, 0, 0, .24)); animation: gift-float 2.6s ease-in-out infinite; }
+    .gift-box { position: absolute; inset: 24px 7px 0; border-radius: 3px; background: var(--coral); }
+    .gift-box::after, .gift-lid::after { content: ""; position: absolute; left: 50%; width: 20px; height: 100%; background: var(--gold); transform: translateX(-50%); }
+    .gift-lid { position: absolute; top: 17px; left: 0; width: 112px; height: 27px; border-radius: 3px; background: #f1847d; transform-origin: 92% 100%; transition: transform 650ms cubic-bezier(.2, .9, .2, 1.2); }
+    .gift-bow, .gift-bow::after { position: absolute; top: -4px; left: 50%; width: 40px; height: 26px; content: ""; border: 8px solid var(--gold); border-radius: 50% 50% 8px 50%; transform: translateX(-93%) rotate(12deg); }
+    .gift-bow::after { top: -8px; left: 37px; transform: rotate(74deg); }
+
+    .tap-label, .action-button {
+      min-height: 44px;
+      padding: 10px 18px;
+      border: 1px solid rgba(255, 248, 232, .48);
+      border-radius: 999px;
+      background: rgba(13, 24, 31, .32);
+      color: var(--ink);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, .12);
+      backdrop-filter: blur(10px);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tap-label { display: inline-flex; position: relative; z-index: 2; align-items: center; font-size: 15px; letter-spacing: .05em; }
+    .action-button.primary { border-color: transparent; background: var(--gold); color: #2b2113; }
+
+    .celebration {
+      justify-content: space-between;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(1.025);
+      transition: opacity 800ms ease 180ms, transform 800ms ease 180ms, visibility 0s linear 1s;
+    }
+
+    .toolbar { display: flex; align-self: stretch; justify-content: flex-end; gap: 10px; z-index: 8; }
+    .icon-button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid rgba(255, 248, 232, .34); border-radius: 50%; background: rgba(13, 24, 31, .35); color: var(--ink); font-size: 21px; cursor: pointer; backdrop-filter: blur(10px); }
+    button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+
+    .sky-decor { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+    .balloon { position: absolute; bottom: -150px; width: 54px; height: 68px; border-radius: 52% 48%; opacity: 0; filter: drop-shadow(0 10px 10px rgba(0, 0, 0, .12)); }
+    .balloon::before { content: ""; position: absolute; left: 50%; bottom: -8px; width: 12px; height: 12px; background: inherit; transform: translateX(-50%) rotate(45deg); }
+    .balloon::after { content: ""; position: absolute; top: calc(100% + 7px); left: 50%; width: 1px; height: 90px; background: rgba(255, 248, 232, .45); }
+    .balloon.one { left: 5%; background: #e86f68; --drift: 28px; --end: -13px; --duration: 11s; --delay: .2s; }
+    .balloon.two { left: 22%; width: 44px; height: 57px; background: #e7b348; --drift: -34px; --end: 15px; --duration: 13s; --delay: 3.4s; }
+    .balloon.three { right: 7%; background: #3f968a; --drift: -30px; --end: 14px; --duration: 12s; --delay: 1.7s; }
+    .balloon.four { right: 25%; width: 46px; height: 59px; background: #d96870; --drift: 26px; --end: -12px; --duration: 14s; --delay: 5.2s; }
+
+    .sparkle { position: absolute; width: 5px; height: 5px; opacity: 0; background: var(--gold); transform: rotate(45deg); box-shadow: 0 0 12px rgba(246, 200, 95, .8); }
+    .sparkle::after { content: ""; position: absolute; inset: -4px 2px; background: inherit; }
+    .s1 { top: 18%; left: 13%; animation-delay: 1.1s; } .s2 { top: 27%; right: 14%; animation-delay: 2.4s; }
+    .s3 { top: 48%; left: 7%; animation-delay: 3.5s; } .s4 { top: 55%; right: 9%; animation-delay: 1.8s; }
+    .s5 { top: 71%; left: 17%; animation-delay: 4.2s; } .s6 { top: 74%; right: 20%; animation-delay: 2.9s; }
+
+    .scene-stickers { position: absolute; inset: 0; z-index: 3; overflow: hidden; pointer-events: none; }
+    .scene-sticker { position: absolute; display: grid; place-items: center; width: 72px; height: 72px; opacity: 0; transform-origin: 50% 70%; }
+    .scene-sticker img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 8px 9px rgba(0, 0, 0, .22)); }
+    .scene-sticker.photo img { width: 90%; height: 90%; border: 2px solid rgba(255, 248, 232, .84); border-radius: 6px; object-fit: cover; box-shadow: 0 8px 14px rgba(0, 0, 0, .18); }
+    .scene-sticker.sticker-one { top: 18%; left: 4%; --tilt: -7deg; --tilt-end: -2deg; --delay: 180ms; --float-time: 3.2s; }
+    .scene-sticker.sticker-two { top: 16%; right: 5%; width: 78px; height: 78px; --tilt: 6deg; --tilt-end: 1deg; --delay: 320ms; --float-time: 3.6s; }
+    .scene-sticker.sticker-three { top: 50%; left: 13%; width: 76px; height: 76px; --tilt: -4deg; --tilt-end: 2deg; --delay: 520ms; --float-time: 3.4s; }
+    .scene-sticker.sticker-four { top: 48%; right: 13%; --tilt: 8deg; --tilt-end: 3deg; --delay: 680ms; --float-time: 3.1s; }
+    .scene-sticker.sticker-five { bottom: 15%; left: 5%; width: 70px; height: 70px; --tilt: 5deg; --tilt-end: -1deg; --delay: 840ms; --float-time: 3.8s; }
+    .scene-sticker.sticker-six { right: 5%; bottom: 16%; --tilt: -6deg; --tilt-end: 0deg; --delay: 960ms; --float-time: 3.5s; }
+    .scene-sticker.sticker-seven { top: 12%; left: calc(50% - 32px); width: 64px; height: 64px; --tilt: 4deg; --tilt-end: -2deg; --delay: 1100ms; --float-time: 3.3s; }
+    .scene-sticker.sticker-eight { top: 18%; left: 22%; width: 62px; height: 62px; --tilt: -5deg; --tilt-end: 2deg; --delay: 260ms; --float-time: 3.7s; }
+    .scene-sticker.sticker-nine { top: 19%; right: 22%; width: 66px; height: 66px; --tilt: 7deg; --tilt-end: 1deg; --delay: 430ms; --float-time: 3.4s; }
+    .scene-sticker.sticker-ten { top: 42%; left: 25%; width: 64px; height: 64px; --tilt: 3deg; --tilt-end: -3deg; --delay: 590ms; --float-time: 3.9s; }
+    .scene-sticker.sticker-eleven { top: 40%; right: 25%; width: 66px; height: 66px; --tilt: -8deg; --tilt-end: -1deg; --delay: 750ms; --float-time: 3.2s; }
+    .scene-sticker.sticker-twelve { bottom: 22%; left: 23%; width: 62px; height: 62px; --tilt: 6deg; --tilt-end: 0deg; --delay: 910ms; --float-time: 3.6s; }
+    .scene-sticker.sticker-thirteen { right: 23%; bottom: 22%; width: 62px; height: 62px; --tilt: -4deg; --tilt-end: 2deg; --delay: 1040ms; --float-time: 3.5s; }
+    .scene-sticker.sticker-fourteen { top: 11%; left: 34%; width: 58px; height: 58px; --tilt: -6deg; --tilt-end: 1deg; --delay: 1160ms; --float-time: 3.8s; }
+    .scene-sticker.sticker-fifteen { top: 11%; right: 34%; width: 58px; height: 58px; --tilt: 5deg; --tilt-end: -2deg; --delay: 1240ms; --float-time: 3.3s; }
+    .scene-sticker.sticker-sixteen { bottom: 9%; left: 35%; width: 54px; height: 54px; --tilt: 8deg; --tilt-end: 2deg; --delay: 1320ms; --float-time: 3.6s; }
+    .scene-sticker.sticker-seventeen { right: 35%; bottom: 9%; width: 54px; height: 54px; --tilt: -7deg; --tilt-end: 0deg; --delay: 1400ms; --float-time: 3.4s; }
+
+    .message-area { position: relative; z-index: 2; display: flex; flex: 1; width: min(100%, 520px); flex-direction: column; align-items: center; justify-content: center; margin-top: -12px; text-shadow: 0 2px 20px rgba(0, 0, 0, .28); }
+    .for-line { margin: 0 0 8px; color: var(--gold); font-size: 13px; font-weight: 700; letter-spacing: .18em; }
+    #receiver { letter-spacing: .04em; }
+    .celebration h1 { font-size: clamp(52px, 15vw, 88px); }
+    .celebration h1 span { display: inline-block; transform-origin: 50% 80%; }
+
+    .wish { display: grid; place-items: center; min-height: 64px; margin: 18px 0 12px; color: rgba(255, 248, 232, .92); font-size: clamp(16px, 4.4vw, 21px); line-height: 1.75; letter-spacing: .03em; transition: opacity 360ms ease, transform 360ms ease; }
+    .wish.is-changing { opacity: 0; transform: translateY(8px); }
+    .wish.is-changing[data-transition="slide"] { transform: translateX(-18px); }
+    .wish.is-changing[data-transition="zoom"] { transform: scale(.9); }
+    .wish.enter-rise { animation: wish-rise 620ms ease both; } .wish.enter-slide { animation: wish-slide 620ms ease both; } .wish.enter-zoom { animation: wish-zoom 620ms ease both; }
+
+    .cake-stage { position: relative; flex: none; width: 270px; height: 220px; margin-top: 4px; }
+    .cake-scene { --cake-rest: 1; --cake-crouch: .92; --cake-launch: 1.15; --cake-impact: 5.4; position: absolute; inset: 0; z-index: 2; width: 270px; height: 220px; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; transform: scale(var(--cake-rest)); transform-origin: 50% 58%; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    .cake-scene:focus-visible { outline: 3px solid var(--gold); outline-offset: 6px; border-radius: 8px; }
+    .cake-scene:active { transform: scale(var(--cake-crouch)); }
+    .plate { position: absolute; left: 50%; bottom: 16px; width: 260px; height: 28px; border-radius: 50%; background: rgba(255, 248, 232, .9); box-shadow: 0 14px 24px rgba(0, 0, 0, .25); transform: translateX(-50%); }
+    .cake-bottom, .cake-top { position: absolute; left: 50%; border-radius: 10px 10px 22px 22px; transform: translateX(-50%); }
+    .cake-bottom { bottom: 30px; width: 220px; height: 90px; background: #d95055; }
+    .cake-top { bottom: 112px; width: 152px; height: 54px; background: #e97870; }
+    .cake-bottom::before, .cake-top::before { content: ""; position: absolute; inset: 0 0 auto; height: 24px; border-radius: 10px 10px 16px 16px; background: #ffdda0; }
+    .cake-bottom::after, .cake-top::after { content: ""; position: absolute; top: 14px; width: 22px; height: 20px; border-radius: 0 0 12px 12px; background: #ffdda0; }
+    .cake-bottom::after { left: 28px; box-shadow: 58px -3px 0 -3px #ffdda0, 126px 1px 0 -2px #ffdda0; }
+    .cake-top::after { left: 22px; width: 18px; height: 17px; box-shadow: 42px 2px 0 -2px #ffdda0, 88px -2px 0 -3px #ffdda0; }
+    .candle { position: absolute; bottom: 164px; width: 10px; height: 42px; border-radius: 3px 3px 0 0; background: repeating-linear-gradient(-35deg, #f8d56e 0 7px, #4aa090 7px 13px); }
+    .candle.one { left: 94px; } .candle.two { left: 130px; height: 50px; } .candle.three { left: 166px; }
+    .flame { position: absolute; left: 50%; bottom: calc(100% + 4px); width: 15px; height: 24px; border-radius: 70% 30% 68% 32%; background: #ffd65a; box-shadow: 0 0 16px 5px rgba(255, 193, 75, .42); transform: translateX(-50%); transform-origin: 50% 100%; animation: flame 620ms ease-in-out infinite alternate; }
+    .candle.two .flame { animation-delay: -180ms; } .candle.three .flame { animation-delay: -330ms; }
+
+    .footer { position: relative; z-index: 2; display: grid; width: min(100%, 520px); justify-items: center; gap: 12px; }
+    .signature { margin: 0; color: var(--muted); font-size: 14px; letter-spacing: .06em; }
+    .footer-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+
+    .impact-flash { position: absolute; inset: 0; z-index: 15; background: #ffdda0; opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .letter-view {
+      z-index: 4;
+      justify-content: space-between;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(6%);
+      background: linear-gradient(180deg, rgba(11, 27, 31, .78), rgba(67, 31, 42, .87));
+      transition: opacity 650ms ease, transform 650ms ease, visibility 0s linear 650ms;
+    }
+
+    .letter-view .toolbar { justify-content: space-between; width: 100%; }
+    .letter-content { position: relative; display: flex; flex: 1; width: min(100%, 580px); flex-direction: column; justify-content: center; align-items: stretch; min-height: 0; padding: 18px 0; text-align: left; }
+    .letter-content::before { content: "“"; position: absolute; top: 3%; left: -6px; color: rgba(246, 200, 95, .16); font-family: Georgia, serif; font-size: 142px; line-height: 1; }
+    .letter-heading { position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
+    .letter-heading-copy { min-width: 0; }
+    .letter-kicker { position: relative; margin: 0 0 10px; color: var(--gold); font-size: 12px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+    .letter-content h2 { position: relative; font-size: clamp(34px, 10vw, 58px); }
+    .letter-rule { width: 58px; height: 3px; margin: 18px 0 12px; border: 0; background: var(--gold); }
+    .letter-copy { position: relative; flex: 1; min-height: 0; max-height: min(47vh, 430px); padding: 2px 10px 2px 0; overflow-y: auto; overscroll-behavior: contain; color: rgba(255, 248, 232, .92); font-size: 17px; line-height: 1.95; letter-spacing: .04em; scrollbar-width: thin; }
+    .letter-copy.compact { font-size: 15px; line-height: 1.82; }
+    .letter-copy p { margin: 0 0 14px; opacity: 0; }
+    .letter-signature { margin: 6px 0 0; color: var(--gold); text-align: right; font-family: "STKaiti", "KaiTi", sans-serif; font-size: 19px; }
+    .letter-footer { display: flex; justify-content: center; width: 100%; gap: 10px; flex-wrap: wrap; }
+
+    .toast { position: absolute; left: 50%; bottom: max(86px, calc(env(safe-area-inset-bottom) + 70px)); z-index: 10; padding: 9px 14px; border-radius: 4px; background: rgba(6, 15, 18, .9); color: var(--ink); font-size: 13px; opacity: 0; pointer-events: none; transform: translate(-50%, 8px); transition: opacity 220ms ease, transform 220ms ease; }
+    .toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
+
+    .experience.is-opening .gift-lid { transform: translate(14px, -42px) rotate(23deg); }
+    .experience.is-open .intro { opacity: 0; pointer-events: none; transform: scale(.96); }
+    .experience.is-open .celebration { opacity: 1; visibility: visible; transform: scale(1); transition-delay: 150ms; }
+    .experience.is-open .scene-sticker { animation: scene-sticker-enter 760ms cubic-bezier(.2, .85, .25, 1.25) var(--delay) both, scene-sticker-float var(--float-time) ease-in-out calc(var(--delay) + 760ms) infinite; }
+    .experience.is-open .balloon { animation: balloon-rise var(--duration) ease-in infinite; animation-delay: var(--delay); }
+    .experience.is-open .sparkle { animation: sparkle 2.8s ease-in-out infinite; }
+    .experience.is-celebrating .celebration h1 span { animation: letter-pop 720ms cubic-bezier(.18, .9, .3, 1.35) both; }
+    .experience.is-celebrating .celebration h1 span:nth-child(2) { animation-delay: 90ms; }
+    .experience.is-celebrating .celebration h1 span:nth-child(3) { animation-delay: 180ms; }
+    .experience.is-celebrating .celebration h1 span:nth-child(4) { animation-delay: 270ms; }
+    .experience.is-celebrating .cake-scene { animation: cake-arrive 950ms cubic-bezier(.18, .85, .28, 1.3) both; }
+
+    .experience.is-cake-throwing .message-area { z-index: 12; }
+    .experience.is-cake-throwing .cake-scene { z-index: 13; pointer-events: none; animation: cake-throw 940ms cubic-bezier(.52, .02, .9, .42) both !important; }
+    .experience.is-cake-throwing .for-line,
+    .experience.is-cake-throwing .celebration h1,
+    .experience.is-cake-throwing .wish,
+    .experience.is-cake-throwing .toolbar,
+    .experience.is-cake-throwing .footer { opacity: 0; transform: scale(.95); transition: opacity 220ms ease, transform 220ms ease; }
+    .experience.is-cake-throwing #effects { opacity: .18; }
+    .experience.is-cake-throwing .impact-flash { visibility: visible; animation: impact-flash 540ms ease-out 560ms both; }
+
+    .experience.is-letter .celebration { opacity: 0; visibility: hidden; transform: translateX(-5%); transition-delay: 0s; }
+    .experience.is-letter #effects { opacity: 0; }
+    .experience.is-letter .letter-view { opacity: 1; visibility: visible; transform: translateX(0); transition-delay: 120ms; }
+    .experience.is-letter .letter-copy p { animation: paragraph-reveal 650ms ease both; animation-delay: calc(var(--index) * 140ms + 280ms); }
+
+    @keyframes gift-float { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-10px) rotate(1deg); } }
+    @keyframes intro-sticker-pop { 0% { opacity: 0; transform: translate(-24px, 28px) scale(.55) rotate(-10deg); } 72% { opacity: 1; transform: translate(4px, -5px) scale(1.06) rotate(3deg); } 100% { opacity: 1; transform: none; } }
+    @keyframes intro-sticker-bob { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-7px) rotate(3deg); } }
+    @keyframes flame { from { transform: translateX(-50%) rotate(-6deg) scale(.92, 1.05); } to { transform: translateX(-50%) rotate(7deg) scale(1.06, .92); } }
+    @keyframes cake-arrive { from { opacity: 0; transform: translateY(70px) scale(.84); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes letter-pop { 0% { opacity: 0; transform: translateY(20px) rotate(-7deg) scale(.65); } 70% { opacity: 1; transform: translateY(-4px) rotate(2deg) scale(1.08); } 100% { opacity: 1; transform: none; } }
+    @keyframes balloon-rise { 0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(-4deg); } 10% { opacity: .66; } 45% { transform: translate3d(var(--drift), -55vh, 0) rotate(5deg); } 88% { opacity: .58; } 100% { opacity: 0; transform: translate3d(var(--end), -120vh, 0) rotate(-5deg); } }
+    @keyframes sparkle { 0%, 100% { opacity: 0; transform: rotate(45deg) scale(.35); } 45% { opacity: .9; transform: rotate(135deg) scale(1.2); } 65% { opacity: .42; transform: rotate(180deg) scale(.72); } }
+    @keyframes wish-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    @keyframes wish-slide { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
+    @keyframes wish-zoom { from { opacity: 0; transform: scale(1.1); } to { opacity: 1; transform: scale(1); } }
+    @keyframes paragraph-reveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    @keyframes cake-throw {
+      0% { opacity: 1; transform: translateY(0) scale(var(--cake-rest)) rotate(0); }
+      18% { opacity: 1; transform: translateY(18px) scale(var(--cake-crouch)) rotate(-3deg); }
+      42% { opacity: 1; transform: translateY(-22px) scale(var(--cake-launch)) rotate(4deg); }
+      86% { opacity: 1; transform: translateY(-7vh) scale(var(--cake-impact)) rotate(-6deg); }
+      100% { opacity: 0; transform: translateY(-7vh) scale(var(--cake-impact)) rotate(-6deg); }
+    }
+    @keyframes impact-flash { 0% { opacity: 0; } 38% { opacity: .94; } 100% { opacity: 0; } }
+    @keyframes scene-sticker-enter { from { opacity: 0; transform: translateY(18px) scale(.58) rotate(-10deg); } to { opacity: 1; transform: translateY(0) scale(1) rotate(var(--tilt)); } }
+    @keyframes scene-sticker-float { 0%, 100% { opacity: 1; transform: translateY(0) rotate(var(--tilt)); } 50% { opacity: 1; transform: translateY(-7px) rotate(var(--tilt-end)); } }
+
+    @media (max-width: 600px) {
+      .scene-sticker.sticker-one { top: 43%; left: 14px; width: 38px; height: 38px; }
+      .scene-sticker.sticker-two { top: 43%; right: 14px; width: 38px; height: 38px; }
+      .scene-sticker.sticker-three { top: 50%; left: 12px; width: 40px; height: 40px; }
+      .scene-sticker.sticker-four { top: 50%; right: 12px; width: 40px; height: 40px; }
+      .scene-sticker.sticker-five { top: 57%; left: 14px; bottom: auto; width: 38px; height: 38px; }
+      .scene-sticker.sticker-six { top: 57%; right: 14px; bottom: auto; width: 38px; height: 38px; }
+      .scene-sticker.sticker-seven { top: 16%; left: calc(50% - 18px); width: 36px; height: 36px; }
+      .scene-sticker.sticker-eight { top: 64%; left: 12px; width: 40px; height: 40px; }
+      .scene-sticker.sticker-nine { top: 64%; right: 12px; width: 40px; height: 40px; }
+      .scene-sticker.sticker-ten { top: 71%; left: 16px; width: 36px; height: 36px; }
+      .scene-sticker.sticker-eleven { top: 71%; right: 16px; width: 36px; height: 36px; }
+      .scene-sticker.sticker-twelve { top: 34%; left: 16px; bottom: auto; width: 36px; height: 36px; }
+      .scene-sticker.sticker-thirteen { top: 34%; right: 16px; bottom: auto; width: 36px; height: 36px; }
+      .scene-sticker.sticker-fourteen { top: 25%; left: 22px; width: 34px; height: 34px; }
+      .scene-sticker.sticker-fifteen { top: 25%; right: 22px; width: 34px; height: 34px; }
+      .scene-sticker.sticker-sixteen { top: 74%; left: 76px; bottom: auto; width: 36px; height: 36px; }
+      .scene-sticker.sticker-seventeen { top: 74%; right: 76px; bottom: auto; width: 36px; height: 36px; }
+    }
+
+    @media (max-height: 700px) {
+      .message-area { margin-top: -28px; }
+      .wish { min-height: 54px; margin: 8px 0 2px; }
+      .cake-stage { margin: -20px 0 -16px; }
+      .cake-scene { --cake-rest: .8; --cake-crouch: .74; --cake-launch: .94; --cake-impact: 4.8; transform: scale(var(--cake-rest)); }
+      .intro-sticker-slot { left: calc(100% + 16px); top: 2px; width: 82px; }
+      .scene-sticker.sticker-one { top: 40%; left: 14px; width: 30px; height: 30px; }
+      .scene-sticker.sticker-two { top: 40%; right: 14px; width: 30px; height: 30px; }
+      .scene-sticker.sticker-three { top: 49%; left: 12px; width: 32px; height: 32px; }
+      .scene-sticker.sticker-four { top: 49%; right: 12px; width: 32px; height: 32px; }
+      .scene-sticker.sticker-five { top: 58%; left: 14px; bottom: auto; width: 30px; height: 30px; }
+      .scene-sticker.sticker-six { top: 58%; right: 14px; bottom: auto; width: 30px; height: 30px; }
+      .scene-sticker.sticker-seven { top: 12%; left: calc(50% - 15px); width: 30px; height: 30px; }
+      .scene-sticker.sticker-eight { top: 67%; left: 12px; width: 32px; height: 32px; }
+      .scene-sticker.sticker-nine { top: 67%; right: 12px; width: 32px; height: 32px; }
+      .scene-sticker.sticker-ten { top: 74%; left: 68px; width: 30px; height: 30px; }
+      .scene-sticker.sticker-eleven { top: 74%; right: 68px; width: 30px; height: 30px; }
+      .scene-sticker.sticker-twelve { top: 31%; left: 14px; bottom: auto; width: 30px; height: 30px; }
+      .scene-sticker.sticker-thirteen { top: 31%; right: 14px; bottom: auto; width: 30px; height: 30px; }
+      .scene-sticker.sticker-fourteen { top: 23%; left: 18px; width: 28px; height: 28px; }
+      .scene-sticker.sticker-fifteen { top: 23%; right: 18px; width: 28px; height: 28px; }
+      .scene-sticker.sticker-sixteen { top: 75%; left: 112px; bottom: auto; width: 28px; height: 28px; }
+      .scene-sticker.sticker-seventeen { top: 75%; right: 112px; bottom: auto; width: 28px; height: 28px; }
+      .experience.is-celebrating .cake-scene { animation-name: cake-arrive-small; }
+      .celebration h1 { font-size: clamp(44px, 12vw, 64px); }
+      .letter-content { padding: 8px 0; }
+      .letter-content h2 { font-size: 34px; }
+      .letter-rule { margin: 10px 0 8px; }
+      .letter-copy { max-height: 45vh; font-size: 15px; line-height: 1.72; }
+      .letter-copy p { margin-bottom: 9px; }
+    }
+
+    @keyframes cake-arrive-small { from { opacity: 0; transform: translateY(50px) scale(.68); } to { opacity: 1; transform: translateY(0) scale(.8); } }
+
+    .experience.reduce-motion .balloon { display: none; }
+    .experience.reduce-motion .sparkle { opacity: .45; }
+    .experience.reduce-motion *,
+    .experience.reduce-motion *::before,
+    .experience.reduce-motion *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  </style>
+</head>
+<body>
+  <main class="experience" id="experience">
+    <img class="background" src="birthday-night.png" alt="" aria-hidden="true">
+    <div class="veil" aria-hidden="true"></div>
+    <canvas id="effects" aria-hidden="true"></canvas>
+    <div class="impact-flash" aria-hidden="true"></div>
+
+    <section class="intro" id="intro" aria-labelledby="intro-title">
+      <div class="intro-copy">
+        <p class="eyebrow">恭喜你发现了!</p>
+        <h1 id="intro-title">生日快乐!</h1>
+        <p class="intro-note">点进来康康吧</p>
+      </div>
+      <button class="open-button" id="open-button" type="button" aria-label="开启生日祝福">
+        <!-- <span class="intro-sticker-slot" aria-hidden="true"><img class="intro-sticker" src="meiji-notepad.png" alt=""></span> -->
+        <span class="gift" aria-hidden="true"><span class="gift-box"></span><span class="gift-lid"></span><span class="gift-bow"></span></span>
+        <!-- <span class="tap-label">轻触开启</span> -->
+      </button>
+    </section>
+
+    <section class="celebration" id="celebration" aria-hidden="true" aria-labelledby="birthday-title">
+      <div class="sky-decor" aria-hidden="true">
+        <span class="balloon one"></span><span class="balloon two"></span><span class="balloon three"></span><span class="balloon four"></span>
+        <span class="sparkle s1"></span><span class="sparkle s2"></span><span class="sparkle s3"></span><span class="sparkle s4"></span><span class="sparkle s5"></span><span class="sparkle s6"></span>
+      </div>
+      <div class="scene-stickers" aria-hidden="true">
+        <span class="scene-sticker sticker-one"><img src="14c3fc6185c.webp" alt=""></span>
+        <span class="scene-sticker sticker-two"><img src="343ab22b86811d232ac6774c3fc6185c.webp" alt=""></span>
+        <span class="scene-sticker sticker-three"><img src="3dd28d5d69c0ee770133c76d27bab9ef.webp" alt=""></span>
+        <span class="scene-sticker sticker-four photo"><img src="o8HAsBidKvBAYMQPJQApiu7Af1BAA0IZpgEVma.webp" alt=""></span>
+        <span class="scene-sticker sticker-five"><img src="ooec21qzADAGAG9hAILUef0G7eROiVvICLIB6Q.gif" alt=""></span>
+        <span class="scene-sticker sticker-six"><img src="oUTAEBBF9EAqAjAAl6ldicIZUfyeDfiEa5cOG6.gif" alt=""></span>
+        <span class="scene-sticker sticker-seven"><img src="7b1b466662de1d48387f1db1d3d6c756 (1).gif" alt=""></span>
+        <span class="scene-sticker sticker-eight"><img src="o4CZAZDIgffILQLG3qQADrD0aHAegVA2ACbIeG.gif" alt=""></span>
+        <span class="scene-sticker sticker-nine"><img src="meiji-pink-cutout.webp" alt=""></span>
+        <span class="scene-sticker sticker-ten"><img src="5262816b607da469776893bab6066e8d.gif" alt=""></span>
+        <span class="scene-sticker sticker-eleven"><img src="meiji-blue-cutout.webp" alt=""></span>
+        <span class="scene-sticker sticker-twelve"><img src="osBABlRNGITAAjhgEQfeELQPJGeNV0QzakSxLA.gif" alt=""></span>
+        <span class="scene-sticker sticker-thirteen"><img src="owAEyApWEFAyZHAgIxjDDWiAGfZAVnqc2ApfCV.gif" alt=""></span>
+        <span class="scene-sticker sticker-fourteen"><img src="o0nbEGQeZGB2AeAzAgLdBjUAAlPA2EzNIqeQbI.gif" alt=""></span>
+        <span class="scene-sticker sticker-fifteen"><img src="o4nlADYA9Q32V89yWNrbGv6qeJA4Cxgf2kI2AA.gif" alt=""></span>
+        <span class="scene-sticker sticker-sixteen"><img src="f09bec8565f6362a932cc8aaa523f478.gif" alt=""></span>
+        <span class="scene-sticker sticker-seventeen"><img src="oInzADZAEQQEReLyJCMbAhfiFIAmCxgIkmIiAA.gif" alt=""></span>
+      </div>
+      <div class="toolbar">
+        <button class="icon-button" id="sound-button" type="button" aria-label="暂停音乐" title="暂停音乐">♪</button>
+        <button class="icon-button" id="replay-button" type="button" aria-label="重新播放" title="重新播放">↻</button>
+      </div>
+      <div class="message-area">
+        <p class="for-line">FOR <span id="receiver">李丽君</span></p>
+        <h1 id="birthday-title" aria-label="生日快乐"><span>生</span><span>日</span><span>快</span><span>乐</span></h1>
+        <p class="wish" id="wish" aria-live="polite">希望你身体健康</p>
+        <div class="cake-stage">
+          <button class="cake-scene" id="cake-button" type="button" aria-label="点击蛋糕，打开给你的话">
+            <div class="plate"></div><div class="cake-bottom"></div><div class="cake-top"></div>
+            <div class="candle one"><span class="flame"></span></div><div class="candle two"><span class="flame"></span></div><div class="candle three"><span class="flame"></span></div>
+          </button>
+        </div>
+      </div>
+      <div class="footer">
+        <p class="signature">来自 <span id="sender">一个惦记你的人</span></p>
+        <div class="footer-actions">
+          <!-- <button class="action-button" id="share-button" type="button">分享祝福</button> -->
+        </div>
+      </div>
+    </section>
+
+    <section class="letter-view" id="letter-view" aria-hidden="true" aria-labelledby="letter-title">
+      <div class="toolbar">
+        <button class="icon-button" id="letter-back-top" type="button" aria-label="返回生日祝福" title="返回">←</button>
+        <button class="icon-button" id="letter-share" type="button" aria-label="分享祝福" title="分享">↗</button>
+      </div>
+      <article class="letter-content">
+        <div class="letter-heading">
+          <div class="letter-heading-copy">
+            <p class="letter-kicker">A letter for you</p>
+            <h2 id="letter-title">写给 <span id="letter-name">亲爱的你</span></h2>
+          </div>
+        </div>
+        <hr class="letter-rule">
+        <div class="letter-copy" id="letter-copy"></div>
+        <p class="letter-signature">不神秘的<span id="letter-sender">一个惦记你的人</span></p>
+      </article>
+      <div class="letter-footer">
+        <button class="action-button" id="letter-back" type="button">回到生日祝福</button>
+      </div>
+    </section>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </main>
+
+  <script>
+    // 修改这里即可定制内容；网址参数 name、from、message、letter 也会覆盖对应项目。
+    const CONFIG = {
+      name: "李丽君",
+      from: "聪明绝顶的人",
+      message: "",
+      letter: `今天是属于你的日子，想认真地对你说一声：生日快乐。
+
+希望你可以越来越好好，指的是可以好好吃饭，按时休息，保持健康
+
+是可以越长大 内心越平静温和
+
+是坚决坚定自己的选择 不做让自己后悔的事情
+
+是能够更坚定的选择理想生活
+
+是可以凭自己照顾好自己 
+
+是保持永远真诚 是学会好好爱自己，好好生活
+
+深深祝福你和你生活里的每一天 老大 我们依旧拥有珍贵的一切 所以继续随心所欲的活着吧!
+`
+    };
+
+    const params = new URLSearchParams(location.search);
+    const clean = (value, fallback, max) => ((value || "").trim().slice(0, max) || fallback);
+    const name = clean(params.get("name"), CONFIG.name, 18);
+    const from = clean(params.get("from"), CONFIG.from, 24);
+    const customMessage = clean(params.get("message"), CONFIG.message, 80);
+    const letterText = clean(params.get("letter"), CONFIG.letter, 800);
+    const wishes = customMessage ? [customMessage, "希望你身体健康", "希望你不再为明天的事情烦忧"] : ["希望你身体健康", "希望你不再为明天的事情烦忧", "希望你多珍视自己"];
+
+    const byId = (id) => document.getElementById(id);
+    const experience = byId("experience");
+    const intro = byId("intro");
+    const celebration = byId("celebration");
+    const letterView = byId("letter-view");
+    const openButton = byId("open-button");
+    const soundButton = byId("sound-button");
+    const replayButton = byId("replay-button");
+    const cakeButton = byId("cake-button");
+    const letterBack = byId("letter-back");
+    const letterBackTop = byId("letter-back-top");
+    const shareButton = byId("share-button");
+    const letterShare = byId("letter-share");
+    const wish = byId("wish");
+    const toast = byId("toast");
+    const canvas = byId("effects");
+    const context = canvas.getContext("2d");
+    const reduceMotion = params.get("motion") === "reduce";
+    experience.classList.toggle("reduce-motion", reduceMotion);
+
+    byId("receiver").textContent = name;
+    byId("sender").textContent = from;
+    byId("letter-name").textContent = name;
+    byId("letter-sender").textContent = from;
+    wish.textContent = wishes[0];
+    document.title = `${name}，生日快乐`;
+
+    const letterCopy = byId("letter-copy");
+    letterText.split(/\n\s*\n/).filter(Boolean).forEach((text, index) => {
+      const paragraph = document.createElement("p");
+      paragraph.textContent = text.trim();
+      paragraph.style.setProperty("--index", index);
+      letterCopy.appendChild(paragraph);
+    });
+    if (letterText.length > 180) letterCopy.classList.add("compact");
+
+    let opened = false;
+    let soundOn = true;
+    let audioContext = null;
+    let audioTimer = null;
+    let wishTimer = null;
+    let wishTimeout = null;
+    let toastTimer = null;
+    let particles = [];
+    let sparks = [];
+    let sceneTimers = [];
+    let animationFrame = null;
+    let burstUntil = 0;
+    let cakeThrowing = false;
+    let cakeThrowTimer = null;
+
+    const melody = [["G4",.36],["G4",.18],["A4",.55],["G4",.55],["C5",.55],["B4",1.05],["G4",.36],["G4",.18],["A4",.55],["G4",.55],["D5",.55],["C5",1.05],["G4",.36],["G4",.18],["G5",.55],["E5",.55],["C5",.55],["B4",.55],["A4",1.05],["F5",.36],["F5",.18],["E5",.55],["C5",.55],["D5",.55],["C5",1.25]];
+    const frequencies = {G4:392,A4:440,B4:493.88,C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99};
+
+    function playMelody() {
+      if (!soundOn) return;
+      if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioContext.state === "suspended") audioContext.resume();
+      const start = audioContext.currentTime + .08;
+      let cursor = start;
+      melody.forEach(([note, duration]) => {
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        oscillator.type = "sine";
+        oscillator.frequency.value = frequencies[note];
+        gain.gain.setValueAtTime(.0001, cursor);
+        gain.gain.exponentialRampToValueAtTime(.13, cursor + .025);
+        gain.gain.exponentialRampToValueAtTime(.0001, cursor + duration - .03);
+        oscillator.connect(gain).connect(audioContext.destination);
+        oscillator.start(cursor); oscillator.stop(cursor + duration);
+        cursor += duration + .07;
+      });
+      clearTimeout(audioTimer);
+      audioTimer = setTimeout(playMelody, Math.max(1000, (cursor - start + 1.8) * 1000));
+    }
+
+    function stopMelody() { clearTimeout(audioTimer); audioTimer = null; if (audioContext?.state === "running") audioContext.suspend(); }
+
+    function startWishes() {
+      clearInterval(wishTimer); clearTimeout(wishTimeout);
+      let index = 0;
+      const transitions = ["rise", "slide", "zoom"];
+      wish.className = "wish"; wish.textContent = wishes[0];
+      if (reduceMotion) return;
+      wishTimer = setInterval(() => {
+        const transition = transitions[index % transitions.length];
+        wish.dataset.transition = transition;
+        wish.classList.add("is-changing");
+        wishTimeout = setTimeout(() => {
+          index = (index + 1) % wishes.length;
+          wish.textContent = wishes[index];
+          wish.classList.remove("is-changing");
+          wish.classList.add(`enter-${transition}`);
+          wishTimeout = setTimeout(() => wish.classList.remove(`enter-${transition}`), 650);
+        }, 360);
+      }, 4300);
+    }
+
+    function resizeCanvas() {
+      const ratio = Math.min(devicePixelRatio || 1, 2);
+      canvas.width = Math.floor(innerWidth * ratio); canvas.height = Math.floor(innerHeight * ratio);
+      canvas.style.width = `${innerWidth}px`; canvas.style.height = `${innerHeight}px`;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+
+    function makeParticle(burst = false) {
+      const colors = ["#f6c85f", "#ef746f", "#53a99b", "#fff4d5"];
+      return { x: burst ? innerWidth * (.38 + Math.random() * .24) : Math.random() * innerWidth, y: burst ? innerHeight * .62 : -24 - Math.random() * innerHeight * .35, vx: burst ? (Math.random() - .5) * 8 : (Math.random() - .5) * 1.6, vy: burst ? -5 - Math.random() * 7 : 1.4 + Math.random() * 2.5, gravity: burst ? .16 : .025, rotation: Math.random() * Math.PI, spin: (Math.random() - .5) * .22, width: 5 + Math.random() * 7, height: 9 + Math.random() * 13, color: colors[Math.floor(Math.random() * colors.length)], opacity: .8 + Math.random() * .2 };
+    }
+
+    function firework(xRatio, yRatio) {
+      if (reduceMotion) return;
+      const colors = ["#f6c85f", "#ef746f", "#53a99b", "#fff4d5"];
+      const x = innerWidth * xRatio, y = innerHeight * yRatio, color = colors[Math.floor(Math.random() * colors.length)];
+      for (let i = 0; i < 46; i++) {
+        const angle = Math.PI * 2 * i / 46 + Math.random() * .08, speed = 1.8 + Math.random() * 3.8;
+        sparks.push({ x, y, px:x, py:y, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed, opacity:.95, decay:.012+Math.random()*.01, color });
+      }
+    }
+
+    function draw(time) {
+      context.clearRect(0, 0, innerWidth, innerHeight);
+      if (time < burstUntil && particles.length < 135) for (let i = 0; i < 6; i++) particles.push(makeParticle(true));
+      particles.forEach((p) => {
+        p.x += p.vx; p.y += p.vy; p.vy += p.gravity; p.rotation += p.spin;
+        context.save(); context.globalAlpha = p.opacity; context.translate(p.x, p.y); context.rotate(p.rotation); context.fillStyle = p.color; context.fillRect(-p.width/2, -p.height/2, p.width, p.height); context.restore();
+      });
+      sparks.forEach((s) => {
+        s.px=s.x; s.py=s.y; s.x+=s.vx; s.y+=s.vy; s.vx*=.985; s.vy=s.vy*.985+.04; s.opacity-=s.decay;
+        context.save(); context.globalAlpha=Math.max(0,s.opacity); context.strokeStyle=s.color; context.lineWidth=2; context.lineCap="round"; context.shadowColor=s.color; context.shadowBlur=8; context.beginPath(); context.moveTo(s.px,s.py); context.lineTo(s.x,s.y); context.stroke(); context.restore();
+      });
+      particles = particles.filter((p) => p.y < innerHeight + 40); sparks = sparks.filter((s) => s.opacity > .02);
+      while (particles.length < 48 && !reduceMotion) particles.push(makeParticle());
+      animationFrame = requestAnimationFrame(draw);
+    }
+
+    function burstConfetti() { if (reduceMotion) return; burstUntil = performance.now() + 520; for (let i=0;i<48;i++) particles.push(makeParticle(true)); if (!animationFrame) animationFrame=requestAnimationFrame(draw); }
+
+    function runScene() {
+      sceneTimers.forEach(clearTimeout); sceneTimers=[];
+      experience.classList.remove("is-celebrating"); void experience.offsetWidth; experience.classList.add("is-celebrating");
+      burstConfetti();
+      sceneTimers.push(setTimeout(()=>firework(.23,.27),1100), setTimeout(()=>firework(.78,.22),2200), setTimeout(burstConfetti,4700), setTimeout(()=>firework(.72,.34),6200), setTimeout(()=>firework(.28,.2),7500));
+    }
+
+    function openExperience() {
+      if (opened) return;
+      opened=true; experience.classList.add("is-opening"); burstConfetti(); playMelody();
+      setTimeout(() => { experience.classList.add("is-open"); intro.setAttribute("aria-hidden","true"); celebration.setAttribute("aria-hidden","false"); startWishes(); runScene(); }, reduceMotion ? 0 : 480);
+    }
+
+    function playCakeImpact() {
+      if (!soundOn || !audioContext) return;
+      const now = audioContext.currentTime;
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      oscillator.type = "triangle";
+      oscillator.frequency.setValueAtTime(190, now);
+      oscillator.frequency.exponentialRampToValueAtTime(48, now + .34);
+      gain.gain.setValueAtTime(.0001, now);
+      gain.gain.exponentialRampToValueAtTime(.16, now + .015);
+      gain.gain.exponentialRampToValueAtTime(.0001, now + .38);
+      oscillator.connect(gain).connect(audioContext.destination);
+      oscillator.start(now); oscillator.stop(now + .4);
+    }
+
+    function throwCake() {
+      if (cakeThrowing || experience.classList.contains("is-letter")) return;
+      cakeThrowing = true;
+      cakeButton.disabled = true;
+      experience.classList.add("is-cake-throwing");
+      clearTimeout(cakeThrowTimer);
+      if (!reduceMotion) setTimeout(playCakeImpact, 590);
+      cakeThrowTimer = setTimeout(() => {
+        showLetter();
+        setTimeout(() => {
+          experience.classList.remove("is-cake-throwing");
+          cakeButton.disabled = false;
+          cakeThrowing = false;
+        }, reduceMotion ? 0 : 650);
+      }, reduceMotion ? 40 : 940);
+    }
+
+    function showLetter() {
+      experience.classList.add("is-letter"); celebration.setAttribute("aria-hidden","true"); letterView.setAttribute("aria-hidden","false"); letterCopy.scrollTop=0;
+    }
+
+    function hideLetter() { experience.classList.remove("is-letter", "is-cake-throwing"); celebration.setAttribute("aria-hidden","false"); letterView.setAttribute("aria-hidden","true"); cakeButton.disabled=false; cakeThrowing=false; }
+    function replay() { hideLetter(); runScene(); startWishes(); if (soundOn) { stopMelody(); setTimeout(playMelody,80); } }
+    function showToast(message) { clearTimeout(toastTimer); toast.textContent=message; toast.classList.add("is-visible"); toastTimer=setTimeout(()=>toast.classList.remove("is-visible"),2200); }
+
+    async function share() {
+      const data={title:`${name}，生日快乐`,text:`${name}，送你一份生日祝福`,url:location.href};
+      try { if (navigator.share) await navigator.share(data); else { await navigator.clipboard.writeText(location.href); showToast("链接已复制"); } }
+      catch (error) { if (error.name !== "AbortError") showToast("请从浏览器菜单分享此页面"); }
+    }
+
+    openButton.addEventListener("click",openExperience);
+    replayButton.addEventListener("click",replay);
+    cakeButton.addEventListener("click",throwCake);
+    letterBack.addEventListener("click",hideLetter);
+    letterBackTop.addEventListener("click",hideLetter);
+    shareButton.addEventListener("click",share);
+    letterShare.addEventListener("click",share);
+    soundButton.addEventListener("click",()=>{ soundOn=!soundOn; soundButton.textContent=soundOn?"♪":"×"; soundButton.setAttribute("aria-label",soundOn?"暂停音乐":"播放音乐"); soundButton.title=soundOn?"暂停音乐":"播放音乐"; if(soundOn)playMelody();else stopMelody(); });
+    addEventListener("resize",resizeCanvas,{passive:true}); resizeCanvas();
+  </script>
+</body>
+</html>
